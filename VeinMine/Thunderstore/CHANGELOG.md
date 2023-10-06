@@ -1,3 +1,5 @@
+## 1.2.9
+- Small update for Valheim 0.217.22
 ## 1.2.8
 
 - Azumatt begins maintaining the mod. (Thanks WiseHorror for the opportunity!)

@@ -16,7 +16,7 @@ namespace Veinmine
     public class VeinMinePlugin : BaseUnityPlugin
     {
         internal const string ModName = "Veinmine";
-        internal const string ModVersion = "1.2.8";
+        internal const string ModVersion = "1.2.9";
         internal const string Author = "wisehorror";
         private const string ModGUID = $"com.{Author}.{ModName}";
         private static string ConfigFileName = $"{ModGUID}.cfg";
