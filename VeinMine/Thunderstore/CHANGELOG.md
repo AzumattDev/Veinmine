@@ -1,3 +1,5 @@
+## 1.2.10
+- NRE Fix and ServerSync update.
 ## 1.2.9
 - Small update for Valheim 0.217.22
 ## 1.2.8

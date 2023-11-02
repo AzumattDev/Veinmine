@@ -67,29 +67,58 @@ namespace Veinmine
     {
         static void Prefix(MineRock5 __instance, HitData hit, out Dictionary<int, Vector3> __state)
         {
+            // Ensure instance is not null.
+            if (__instance == null)
+            {
+                __state = null;
+                return;
+            }
+
             __instance.SetupColliders();
             __state = new Dictionary<int, Vector3>();
 
+            // Safely get the closest player and check if it's not null.
             Player closestPlayer = Player.GetClosestPlayer(hit.m_point, 5f);
-            float radius = VeinMinePlugin.progressiveMult.Value * (float)Functions.GetSkillLevel(closestPlayer.GetSkills(), Skills.SkillType.Pickaxes);
+            if (closestPlayer == null)
+            {
+                return;
+            }
 
-            if (VeinMinePlugin.veinMineKey.Value.IsKeyHeld())
+            // Safe retrieval of skill level.
+            float skillLevel;
+            try
+            {
+                skillLevel = (float)Functions.GetSkillLevel(closestPlayer.GetSkills(), Skills.SkillType.Pickaxes);
+            }
+            catch
+            {
+                skillLevel = 0;
+            }
+
+            float radius = VeinMinePlugin.progressiveMult.Value * skillLevel;
+
+            if (VeinMinePlugin.veinMineKey?.Value.IsKeyHeld() == true)
             {
                 IEnumerable<Collider> radiusColliders;
 
-                if (VeinMinePlugin.progressiveMode.Value == VeinMinePlugin.Toggle.On)
+                if (VeinMinePlugin.progressiveMode?.Value == VeinMinePlugin.Toggle.On)
                     radiusColliders = Physics.OverlapSphere(hit.m_point, radius);
                 else
-                    radiusColliders = __instance.m_hitAreas.Select(area => area.m_collider);
+                    radiusColliders = __instance.m_hitAreas?.Select(area => area?.m_collider).Where(c => c != null);
 
-                foreach (var area in radiusColliders)
+                if (radiusColliders != null)
                 {
-                    int areaIndex = __instance.GetAreaIndex(area);
-                    if (areaIndex >= 0)
+                    foreach (var area in radiusColliders)
                     {
-                        __state.Add(areaIndex,
-                            __instance.GetHitArea(areaIndex).m_bound.m_pos +
-                            __instance.GetHitArea(areaIndex).m_collider.transform.position);
+                        int areaIndex = __instance.GetAreaIndex(area);
+                        if (areaIndex >= 0)
+                        {
+                            var hitArea = __instance.GetHitArea(areaIndex);
+                            if (hitArea?.m_bound != null && hitArea.m_collider != null)
+                            {
+                                __state.Add(areaIndex, hitArea.m_bound.m_pos + hitArea.m_collider.transform.position);
+                            }
+                        }
                     }
                 }
             }
@@ -97,11 +126,16 @@ namespace Veinmine
 
         public static void Postfix(MineRock5 __instance, ZNetView ___m_nview, HitData hit, Dictionary<int, Vector3> __state)
         {
+            if (__state == null || __instance == null || ___m_nview == null)
+            {
+                return;
+            }
+
             Player closestPlayer = Player.GetClosestPlayer(hit.m_point, 5f);
-            if (closestPlayer != null && hit.m_attacker == closestPlayer.GetZDOID() && VeinMinePlugin.veinMineKey.Value.IsKeyHeld())
+            if (closestPlayer != null && hit.m_attacker == closestPlayer.GetZDOID() && VeinMinePlugin.veinMineKey?.Value.IsKeyHeld() == true)
             {
                 var currentWeapon = closestPlayer.GetCurrentWeapon();
-                if (currentWeapon.GetDamage().m_pickaxe > 0)
+                if (currentWeapon != null && currentWeapon.GetDamage().m_pickaxe > 0)
                 {
                     foreach (var index in __state)
                     {
@@ -113,7 +147,8 @@ namespace Veinmine
                             }
                             catch
                             {
-                                VeinMinePlugin.logger.LogInfo($"Skipping section: {index.Key}.");
+                                // It's a good idea to log which collider caused the issue
+                                VeinMinePlugin.logger.LogInfo($"Skipping section: {index.Key} due to an error.");
                             }
                         }
                     }

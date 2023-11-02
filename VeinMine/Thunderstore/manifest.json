@@ -1,6 +1,6 @@
 {
   "name": "Veinmine",
-  "version_number": "1.2.9",
+  "version_number": "1.2.10",
   "website_url": "https://www.nexusmods.com/valheim/mods/556",
   "description": "Allows you to mine a whole rock/ore vein by holding down a key. Progressive mode is a less OP version meant to fit in better in Vanilla",
   "dependencies": [

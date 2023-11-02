@@ -21,7 +21,6 @@ namespace Veinmine
             VeinMinePlugin.logger.LogInfo("Invoking version check");
             ZPackage zpackage = new();
             zpackage.Write(VeinMinePlugin.ModVersion);
-            zpackage.Write(RpcHandlers.ComputeHashForMod().Replace("-", ""));
             peer.m_rpc.Invoke($"{VeinMinePlugin.ModName}_VersionCheck", zpackage);
         }
     }
@@ -77,14 +76,11 @@ namespace Veinmine
         public static void RPC_Recycle_N_Reclaim_Version(ZRpc rpc, ZPackage pkg)
         {
             string? version = pkg.ReadString();
-            string? hash = pkg.ReadString();
 
-            var hashForAssembly = ComputeHashForMod().Replace("-", "");
-
-            VeinMinePlugin.logger.LogInfo($"Hash/Version check, local: {VeinMinePlugin.ModVersion} {hashForAssembly} remote: {version} {hash}");
-            if (hash != hashForAssembly || version != VeinMinePlugin.ModVersion)
+            VeinMinePlugin.logger.LogInfo($"Hash/Version check, local: {VeinMinePlugin.ModVersion} remote: {version}");
+            if (version != VeinMinePlugin.ModVersion)
             {
-                VeinMinePlugin.ConnectionError = $"{VeinMinePlugin.ModName} Installed: {VeinMinePlugin.ModVersion} {hashForAssembly}\n Needed: {version} {hash}";
+                VeinMinePlugin.ConnectionError = $"{VeinMinePlugin.ModName} Installed: {VeinMinePlugin.ModVersion}\n Needed: {version}";
                 if (!ZNet.instance.IsServer()) return;
                 // Different versions - force disconnect client from server
                 VeinMinePlugin.logger.LogWarning($"Peer ({rpc.m_socket.GetHostName()}) has incompatible version, disconnecting...");
@@ -104,21 +100,6 @@ namespace Veinmine
                     ValidatedPeers.Add(rpc);
                 }
             }
-        }
-
-        public static string ComputeHashForMod()
-        {
-            using SHA256 sha256Hash = SHA256.Create();
-            // ComputeHash - returns byte array  
-            byte[] bytes = sha256Hash.ComputeHash(File.ReadAllBytes(Assembly.GetExecutingAssembly().Location));
-            // Convert byte array to a string   
-            StringBuilder builder = new();
-            foreach (byte b in bytes)
-            {
-                builder.Append(b.ToString("X2"));
-            }
-
-            return builder.ToString();
         }
     }
 }
