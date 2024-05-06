@@ -7,7 +7,7 @@ namespace Veinmine
         public static float GetSkillIncreaseStep(Skills playerSkills, Skills.SkillType skillType)
         {
             if (playerSkills != null)
-                foreach (var skill in playerSkills.m_skills)
+                foreach (Skills.SkillDef? skill in playerSkills.m_skills)
                 {
                     if (skill.m_skill == skillType)
                     {
@@ -30,7 +30,7 @@ namespace Veinmine
             return Vector3.Distance(playerPos, colliderPos);
         }
 
-        public static HitData SpreadDamage(HitData hit)
+        public static HitData? SpreadDamage(HitData hit)
         {
             if (hit != null)
             {

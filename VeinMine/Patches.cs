@@ -15,7 +15,7 @@ namespace Veinmine
             if (VeinMinePlugin.veinMineKey.Value.IsKeyHeld())
             {
                 Vector3 firstHitPoint = hit.m_point;
-                foreach (var area in __instance.m_hitAreas)
+                foreach (Collider? area in __instance.m_hitAreas)
                 {
                     if (area == null) continue;
 
@@ -70,7 +70,7 @@ namespace Veinmine
             // Ensure instance is not null.
             if (__instance == null)
             {
-                __state = null;
+                __state = null!;
                 return;
             }
 
@@ -104,16 +104,16 @@ namespace Veinmine
                 if (VeinMinePlugin.progressiveMode?.Value == VeinMinePlugin.Toggle.On)
                     radiusColliders = Physics.OverlapSphere(hit.m_point, radius);
                 else
-                    radiusColliders = __instance.m_hitAreas?.Select(area => area?.m_collider).Where(c => c != null);
+                    radiusColliders = __instance.m_hitAreas?.Select(area => area?.m_collider).Where(c => c != null)!;
 
                 if (radiusColliders != null)
                 {
-                    foreach (var area in radiusColliders)
+                    foreach (Collider? area in radiusColliders)
                     {
                         int areaIndex = __instance.GetAreaIndex(area);
                         if (areaIndex >= 0)
                         {
-                            var hitArea = __instance.GetHitArea(areaIndex);
+                            MineRock5.HitArea? hitArea = __instance.GetHitArea(areaIndex);
                             if (hitArea?.m_bound != null && hitArea.m_collider != null)
                             {
                                 __state.Add(areaIndex, hitArea.m_bound.m_pos + hitArea.m_collider.transform.position);
@@ -134,16 +134,16 @@ namespace Veinmine
             Player closestPlayer = Player.GetClosestPlayer(hit.m_point, 5f);
             if (closestPlayer != null && hit.m_attacker == closestPlayer.GetZDOID() && VeinMinePlugin.veinMineKey?.Value.IsKeyHeld() == true)
             {
-                var currentWeapon = closestPlayer.GetCurrentWeapon();
+                ItemDrop.ItemData? currentWeapon = closestPlayer.GetCurrentWeapon();
                 if (currentWeapon != null && currentWeapon.GetDamage().m_pickaxe > 0)
                 {
-                    foreach (var index in __state)
+                    foreach (KeyValuePair<int, Vector3> index in __state)
                     {
                         if (currentWeapon.m_durability > 0 || !currentWeapon.m_shared.m_useDurability)
                         {
                             try
                             {
-                                ___m_nview.InvokeRPC("Damage", hit, index.Key);
+                                ___m_nview.InvokeRPC("RPC_Damage", hit, index.Key);
                             }
                             catch
                             {
@@ -187,7 +187,7 @@ namespace Veinmine
             __state = hitArea.m_health;
             Vector3 hitPoint = hitArea.m_collider.bounds.center;
 
-            if (VeinMinePlugin.enableSpreadDamage.Value == VeinMinePlugin.Toggle.On) hit = Functions.SpreadDamage(hit);
+            if (VeinMinePlugin.enableSpreadDamage.Value == VeinMinePlugin.Toggle.On) hit = Functions.SpreadDamage(hit)!;
 
             bool isVeinmined = VeinMinePlugin.veinMineKey.Value.IsKeyHeld();
             VeinMinePlugin.logger.LogInfo($"Hit mine rock {hitAreaIndex}");
@@ -235,7 +235,7 @@ namespace Veinmine
 
             if (hitArea.m_health <= 0f)
             {
-                __instance.m_nview.InvokeRPC(ZNetView.Everybody, "SetAreaHealth", new object[]
+                __instance.m_nview.InvokeRPC(ZNetView.Everybody, "RPC_SetAreaHealth", new object[]
                 {
                     hitAreaIndex,
                     hitArea.m_health
@@ -279,7 +279,7 @@ namespace Veinmine
             {
                 if (__state > 0f && hit.m_attacker == closestPlayer.GetZDOID())
                 {
-                    var skills = closestPlayer.GetSkills();
+                    Skills? skills = closestPlayer.GetSkills();
                     float skillIncreaseStep = Functions.GetSkillIncreaseStep(skills, Skills.SkillType.Pickaxes);
 
                     if (VeinMinePlugin.progressiveMode.Value == VeinMinePlugin.Toggle.Off)
