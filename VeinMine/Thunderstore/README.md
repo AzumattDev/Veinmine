@@ -60,8 +60,10 @@ https://www.youtube.com/watch?v=Kt_6lwGd2Ns
 
    > For Thunderstore Mod Manager, you can also install it through the Overwolf app store
    ![](https://i.imgur.com/HQLZFp4.png "Thunderstore Mod Manager Download")
-2. **Open the Mod Manager and search for "" under the Online
-   tab. `Note: You can also search for "Azumatt" to find all my mods.`**
+2. **Open the Mod Manager and search for "Veinmine" under the Online
+   tab.**
+
+`Note: You can also search for "Azumatt" to find all my mods.`
 
    `The image below shows VikingShip as an example, but it was easier to reuse the image.`
 
