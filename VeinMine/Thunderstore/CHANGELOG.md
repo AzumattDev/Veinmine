@@ -1,3 +1,5 @@
+## 1.3.1
+- Update ServerSync
 ## 1.3.0
 - Update for Ashlands.
 ## 1.2.10
